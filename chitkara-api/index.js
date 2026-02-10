@@ -43,7 +43,7 @@ const lcm = (arr) => arr.reduce((a, b) => (a * b) / gcd(a, b));
 
 /* ================= ROUTES ================= */
 
-// Root (optional but helpful)
+// Root (optional – avoids confusion)
 app.get("/", (req, res) => {
   res.json({
     message: "BFHL API is running",
@@ -146,7 +146,12 @@ app.post("/bfhl", async (req, res) => {
   }
 });
 
-/* ================= START SERVER ================= */
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+/* ================= EXPORT FOR VERCEL ================= */
+module.exports = app;
+
+/* ================= LOCAL RUN ================= */
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
+}
