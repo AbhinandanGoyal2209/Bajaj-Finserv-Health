@@ -26,8 +26,14 @@ const isPrime = (n) => {
 };
 
 const gcd = (a, b) => (b === 0 ? a : gcd(b, a % b));
-const hcf = (arr) => arr.reduce(gcd);
-const lcm = (arr) => arr.reduce((a, b) => (a * b) / gcd(a, b));
+const hcf = (arr) => {
+  if (!arr || arr.length === 0) throw new Error("Array cannot be empty");
+  return arr.reduce(gcd);
+};
+const lcm = (arr) => {
+  if (!arr || arr.length === 0) throw new Error("Array cannot be empty");
+  return arr.reduce((a, b) => (a * b) / gcd(a, b));
+};
 
 /* ---------- ROUTES ---------- */
 
@@ -69,7 +75,11 @@ app.post("/bfhl", async (req, res) => {
           }
         );
         const text = aiRes.data.candidates[0].content.parts[0].text;
-        data = text.match(/[A-Za-z]+/g).pop();
+        const matches = text.match(/[A-Za-z]+/g);
+        if (!matches || matches.length === 0) {
+          throw new Error("No valid words found in AI response");
+        }
+        data = matches.pop();
         break;
 
       default:
@@ -89,5 +99,29 @@ app.post("/bfhl", async (req, res) => {
     });
   }
 });
+
+// 404 Handler for undefined routes
+app.use((req, res) => {
+  res.status(404).json({
+    is_success: false,
+    error: "Route not found"
+  });
+});
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+  res.status(500).json({
+    is_success: false,
+    error: err.message || "Internal server error"
+  });
+});
+
+// Only listen locally, not on Vercel
+if (process.env.NODE_ENV !== "production") {
+  const PORT = process.env.PORT || 3000;
+  app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+  });
+}
 
 module.exports = app;
