@@ -147,6 +147,7 @@ app.post("/bfhl", async (req, res) => {
 });
 
 /* ================= EXPORT FOR VERCEL ================= */
+// Export the app for Vercel serverless and local use
 module.exports = app;
 
 /* ================= LOCAL RUN ================= */
