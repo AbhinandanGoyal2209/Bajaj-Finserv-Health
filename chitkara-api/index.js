@@ -5,13 +5,10 @@ require("dotenv").config();
 const app = express();
 app.use(express.json());
 
-/* ================= CONFIG ================= */
-const PORT = process.env.PORT || 3000;
+const PORT = 3000;
 const EMAIL = "abhinandan0177.be23@chitkara.edu.in";
 
-/* ================= HELPERS ================= */
-
-// Fibonacci
+// Fibonacci series
 const fibonacci = (n) => {
   if (n <= 0) return [];
   let a = 0, b = 1;
@@ -23,7 +20,7 @@ const fibonacci = (n) => {
   return res;
 };
 
-// Prime
+// Prime check
 const isPrime = (num) => {
   if (num < 2) return false;
   for (let i = 2; i <= Math.sqrt(num); i++) {
@@ -41,21 +38,13 @@ const hcf = (arr) => arr.reduce((a, b) => gcd(a, b));
 // LCM
 const lcm = (arr) => arr.reduce((a, b) => (a * b) / gcd(a, b));
 
-/* ================= ROUTES ================= */
 
-// Root (optional – avoids confusion)
-app.get("/", (req, res) => {
-  res.json({
-    message: "BFHL API is running",
-    endpoints: ["/health", "/bfhl"]
-  });
-});
 
-// Health API
+// Health Check API
 app.get("/health", (req, res) => {
   res.status(200).json({
     is_success: true,
-    official_email: EMAIL
+    official_email:"abhinandan0177.be23@chitkara.edu.in"
   });
 });
 
@@ -110,21 +99,20 @@ app.post("/bfhl", async (req, res) => {
         }
 
         const aiResponse = await axios.post(
-          `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
+          `https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=${process.env.GEMINI_API_KEY}`,
           {
             contents: [
               {
+                role: "user",
                 parts: [{ text: body.AI }]
               }
             ]
           }
         );
 
-        const text =
-          aiResponse.data.candidates[0].content.parts[0].text;
-
-        const words = text.match(/[A-Za-z]+/g);
-        data = words[words.length - 1]; // single-word output
+        data = aiResponse.data.candidates[0].content.parts[0].text
+          .split(" ")[0]
+          .replace(/[^a-zA-Z]/g, "");
 
         break;
 
@@ -146,13 +134,15 @@ app.post("/bfhl", async (req, res) => {
   }
 });
 
-/* ================= EXPORT FOR VERCEL ================= */
-// Export the app for Vercel serverless and local use
+
+// app.listen(PORT, () => {
+//   console.log(`Server running on http://localhost:${PORT}`);
+// });
+
 module.exports = app;
 
-/* ================= LOCAL RUN ================= */
 if (require.main === module) {
-  app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+  app.listen(process.env.PORT || 3000, () => {
+    console.log("Server running");
   });
 }
