@@ -6,7 +6,7 @@ const app = express();
 app.use(express.json());
 
 /* ================= CONFIG ================= */
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 const EMAIL = "abhinandan0177.be23@chitkara.edu.in";
 
 /* ================= HELPERS ================= */
@@ -42,6 +42,14 @@ const hcf = (arr) => arr.reduce((a, b) => gcd(a, b));
 const lcm = (arr) => arr.reduce((a, b) => (a * b) / gcd(a, b));
 
 /* ================= ROUTES ================= */
+
+// Root (optional but helpful)
+app.get("/", (req, res) => {
+  res.json({
+    message: "BFHL API is running",
+    endpoints: ["/health", "/bfhl"]
+  });
+});
 
 // Health API
 app.get("/health", (req, res) => {
@@ -138,11 +146,7 @@ app.post("/bfhl", async (req, res) => {
   }
 });
 
-/* ================= START ================= */
-module.exports = app;
-
-if (require.main === module) {
-  app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
-  });
-}
+/* ================= START SERVER ================= */
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
